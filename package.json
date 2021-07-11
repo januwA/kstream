@@ -1,0 +1,43 @@
+{
+  "name": "ajanuw-kstream",
+  "version": "0.1.1",
+  "description": "Packaging DataView",
+  "private": false,
+  "main": "./dist/kstream.js",
+  "module": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "webpack --config __config__/webpack/prod.config.js",
+    "tsc:build": "wsl rm -rf ./dist && tsc -p ./tsconfig.build.json",
+    "test": "jest"
+  },
+  "keywords": [
+    "kstream",
+    "DataView",
+    "Read binary file",
+    "Write binary file"
+  ],
+  "author": "Ajanuw",
+  "license": "MIT",
+  "homepage": "https://github.com/januwA/kstream",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/januwA/kstream.git"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "clean-webpack-plugin": "^3.0.0",
+    "jest": "^27.0.3",
+    "json5": "^2.2.0",
+    "node-notifier": "^10.0.0",
+    "struct-buffer": "^4.6.1",
+    "terser-webpack-plugin": "^5.1.3",
+    "ts-jest": "^27.0.2",
+    "ts-loader": "^9.2.2",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0"
+  },
+  "dependencies": {}
+}
