@@ -6,7 +6,7 @@ const TerserJSPlugin = require("terser-webpack-plugin");
 const shared = require("./shared");
 
 const prodConfig = {
-  target: 'node', // 如果你只想打包在nodejs环境中运行的代码，就开启这个
+  // target: 'node', // 如果你只想打包在nodejs环境中运行的代码，就开启这个
   mode: process.env.NODE_ENV,
   module: {
     rules: shared.rules,

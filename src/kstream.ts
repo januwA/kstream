@@ -15,6 +15,11 @@ type uint64 = bigint;
 type float = number;
 type double = number;
 
+const BYTE_SIZE = 1;
+const WORD_SIZE = 2;
+const DWORD_SIZE = 4;
+const QWORD_SIZE = 8;
+
 export class kstream {
   /**
    * Text decoder, you can reset
@@ -83,22 +88,22 @@ export class kstream {
       const uint8arr = new Uint8Array(buf.byteLength);
       buf.copy(uint8arr, 0, 0, buf.byteLength);
       _v = new DataView(uint8arr.buffer);
-    } else if (v instanceof Buffer) {
-      const uint8arr = new Uint8Array(v.byteLength);
-      v.copy(uint8arr, 0, 0, v.byteLength);
-      _v = new DataView(uint8arr.buffer);
     } else if (v instanceof Uint8Array) {
       _v = new DataView(v.buffer);
     } else if (v instanceof DataView) {
       _v = v;
+    } else if (v instanceof Buffer) {
+      // 最后检查nodejs中的Buffer对象
+      const uint8arr = new Uint8Array(v.byteLength);
+      v.copy(uint8arr, 0, 0, v.byteLength);
+      _v = new DataView(uint8arr.buffer);
     } else {
       throw "Unknown args[0]";
     }
-
     return new kstream(_v, pos, littleEndian);
   }
 
-  private _pos(size: number = 1): number {
+  private _pos(size: number = BYTE_SIZE): number {
     const p = this.pos_;
     this.pos_ += size;
     this.offset = size;
@@ -132,64 +137,64 @@ export class kstream {
   }
 
   get i16(): int16 {
-    return this.v.getInt16(this._pos(2), this.littleEndian);
+    return this.v.getInt16(this._pos(WORD_SIZE), this.littleEndian);
   }
   set i16(value: int16) {
-    this.v.setInt16(this._pos(2), value, this.littleEndian);
+    this.v.setInt16(this._pos(WORD_SIZE), value, this.littleEndian);
   }
 
   get u16(): uint16 {
-    return this.v.getUint16(this._pos(2), this.littleEndian);
+    return this.v.getUint16(this._pos(WORD_SIZE), this.littleEndian);
   }
   set u16(value: uint16) {
-    this.v.setUint16(this._pos(2), value, this.littleEndian);
+    this.v.setUint16(this._pos(WORD_SIZE), value, this.littleEndian);
   }
 
   get i32(): int32 {
-    return this.v.getInt32(this._pos(4), this.littleEndian);
+    return this.v.getInt32(this._pos(DWORD_SIZE), this.littleEndian);
   }
   set i32(value: int32) {
-    this.v.setInt32(this._pos(4), value, this.littleEndian);
+    this.v.setInt32(this._pos(DWORD_SIZE), value, this.littleEndian);
   }
 
   get u32(): uint32 {
-    return this.v.getUint32(this._pos(4), this.littleEndian);
+    return this.v.getUint32(this._pos(DWORD_SIZE), this.littleEndian);
   }
   set u32(value: uint32) {
-    this.v.setUint32(this._pos(4), value, this.littleEndian);
+    this.v.setUint32(this._pos(DWORD_SIZE), value, this.littleEndian);
   }
 
   get i64(): int64 {
-    return this.v.getBigInt64(this._pos(8), this.littleEndian);
+    return this.v.getBigInt64(this._pos(QWORD_SIZE), this.littleEndian);
   }
   set i64(value: int64) {
-    this.v.setBigInt64(this._pos(8), value, this.littleEndian);
+    this.v.setBigInt64(this._pos(QWORD_SIZE), value, this.littleEndian);
   }
 
   get u64(): uint64 {
-    return this.v.getBigUint64(this._pos(8), this.littleEndian);
+    return this.v.getBigUint64(this._pos(QWORD_SIZE), this.littleEndian);
   }
   set u64(value: uint64) {
-    this.v.setBigUint64(this._pos(8), value, this.littleEndian);
+    this.v.setBigUint64(this._pos(QWORD_SIZE), value, this.littleEndian);
   }
 
   get float(): float {
-    return this.v.getFloat32(this._pos(4), this.littleEndian);
+    return this.v.getFloat32(this._pos(DWORD_SIZE), this.littleEndian);
   }
   set float(value: float) {
-    this.v.setFloat32(this._pos(4), value, this.littleEndian);
+    this.v.setFloat32(this._pos(DWORD_SIZE), value, this.littleEndian);
   }
 
   get double(): double {
-    return this.v.getFloat64(this._pos(8), this.littleEndian);
+    return this.v.getFloat64(this._pos(QWORD_SIZE), this.littleEndian);
   }
   set double(value: double) {
-    this.v.setFloat64(this._pos(8), value, this.littleEndian);
+    this.v.setFloat64(this._pos(QWORD_SIZE), value, this.littleEndian);
   }
 
   /**
-   * Read the string, you can specify the length of the string, the default -1 reads the string ending with null, but does not contain null
-   * @param len
+   * If len is equal to -1 then read the c string
+   * @param len String byte length
    * @returns
    */
   readString(len: number = -1): string {
@@ -240,7 +245,6 @@ export class kstream {
   copy(count: number): Uint8Array {
     const dst = new Uint8Array(new ArrayBuffer(count));
     for (let i = 0; i < count; dst[i] = this.pu8(i++));
-
     return dst;
   }
 
@@ -290,6 +294,14 @@ export class kstream {
       this.u8 = c;
     }
     this.offset = count;
+  }
+
+  replace(buf: DataView): void;
+  replace(buf: Uint8Array): void;
+  replace(buf: any) {
+    if (buf instanceof DataView) buf = new Uint8Array(buf.buffer);
+    for (let i = 0; i < buf.byteLength; i++) this.u8 = buf[i];
+    this.offset = buf.byteLength;
   }
 
   /**

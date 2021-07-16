@@ -49,6 +49,9 @@ module.exports = {
     alias: {
       ...util.alias(),
     },
+    fallback: {
+      fs: false,
+    },
   },
 
   // 优化: https://webpack.js.org/configuration/optimization/

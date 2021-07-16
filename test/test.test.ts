@@ -111,4 +111,15 @@ describe("test kstream", () => {
     expect(ks.pos).toBe(3);
     expect(ks.offset).toBe(2);
   });
+
+  it("test kstream replace", () => {
+    const ks = kstream.create(b("01 00 00 00"));
+    expect(ks.i32).toBe(1);
+
+    ks.back();
+    ks.replace(b("02 00 00 00"));
+
+    ks.back()
+    expect(ks.i32).toBe(2);
+  });
 });

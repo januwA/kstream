@@ -52,6 +52,8 @@ export declare class kstream {
     insert(bytes: Uint8Array): void;
     insert(bytes: DataView): void;
     set(c: uint8, count: number): void;
+    replace(buf: DataView): void;
+    replace(buf: Uint8Array): void;
     cmp(buf2: Uint8Array, count: number, buf2Offset?: number): boolean;
     cmp(buf2: DataView, count: number, buf2Offset?: number): boolean;
     icmp(buf2: Uint8Array, count: number, buf2Offset?: number): boolean;
